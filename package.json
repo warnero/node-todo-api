@@ -1,0 +1,38 @@
+{
+  "name": "node-todo-api",
+  "author": "Warner Onstine <warnero@gmail.com>",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "dependencies": {
+    "restify": "*",
+    "mongoose": "*",
+    "moment": "~2.8.4",
+    "mongodb": "*",
+    "mongoose-validator": "*",
+    "validator": "*",
+    "restify-oauth2": "*",
+    "redis": "*",
+    "request": "*",
+    "async": "*",
+    "lodash": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "supertest": "*",
+    "blanket": "*",
+    "hyperquest": "*",
+    "gulp": "*",
+    "gulp-mocha": "*",
+    "gulp-jshint": "*",
+    "gulp-exit": "*",
+    "q": "*"
+  }
+}
