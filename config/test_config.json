@@ -1,3 +1,4 @@
 {
-    
+    "port": 5536,
+    "mongo": "mongodb://localhost/todo-test"
 }

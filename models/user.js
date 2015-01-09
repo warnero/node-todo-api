@@ -10,7 +10,8 @@ var UserModel = function(){
         _id: {type:Schema.Types.ObjectId, "default":mongoose.Types.ObjectId},
         name: String,
         email: String,
-        hashedPassword: String
+        hashedPassword: String,
+        created: {type: Date, "default": Date.now}
     };
 
     var _schema = mongoose.Schema(_jsonSchema);

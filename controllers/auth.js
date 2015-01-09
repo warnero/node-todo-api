@@ -1,7 +1,7 @@
 var AuthController = function(){
 
     var
-        Settings = require("../config/settings"),
+        conf = require("../config/settings"),
         User = require("../models/user"),
         AuthUtils = require("../utils/auth"),
         JSONUtils = require("../utils/json"),
@@ -31,10 +31,12 @@ var AuthController = function(){
             .findOne({
                 _id: user._id || user
             })
-            .populate('services.clientService')
             .lean()
             .exec(function(err, user){
                 if(err) return done(err);
+                delete user.hashedPassword;
+                delete user.__v;
+
                 return done(err, user);
             });
     };
@@ -42,14 +44,14 @@ var AuthController = function(){
     var _generateToken = function(data){
         var random = Math.floor(Math.random() * 100001);
         var timestamp = (new Date()).getTime();
-        var sha256 = crypto.createHmac("sha256", random + Settings.auth.token.salt + timestamp);
+        var sha256 = crypto.createHmac("sha256", random + conf.get('auth.token.salt') + timestamp);
         return sha256.update(data).digest("base64");
     };
 
     var _saveToken = function(token, user, done) {
         var
-            id = Settings.redis.prefix + token,
-            maxAge = Settings.auth.token.maxAge;
+            id = conf.get('redis.prefix') + token,
+            maxAge = conf.get('auth.token.maxAge');
 
         user = JSON.stringify(user);
 
@@ -59,7 +61,8 @@ var AuthController = function(){
     };
 
     var _getTokenData = function(token, done) {
-        var id = Settings.redis.prefix + token;
+        console.log("getting token data");
+        var id = conf.get('redis.prefix') + token;
 
         rclient.get(id, function(err, data){
             if (err || !data) return done(err);
@@ -68,7 +71,7 @@ var AuthController = function(){
     };
 
     var _clearTokenData = function(token, done) {
-        var id = Settings.redis.prefix + token;
+        var id = conf.get('redis.prefix') + token;
 
         rclient.del(id, function(err, data){
             if (err || !data) return done(err);
@@ -76,23 +79,24 @@ var AuthController = function(){
         });
     };
 
-    var _validateClient = function(id, secret, done){
-        console.log("validateClient %s %s", id, secret);
+    var _validateClient = function(client, req, done){
+        // console.log("validateClient", client.clientId, client.clientSecret);
+        // TODO: eventually we want to validate who this is coming from, but this is fine for the moment
         return done(null,true);
     };
 
-    var _grantUserToken = function(email, password, done){
-        console.log("grantUserToken %s, %s", email, password);
-        var hashedPassword = AuthUtils.hashPassword(password);
+    var _grantUserToken = function(grant, req, done){
+        var hashedPassword = AuthUtils.hashPassword(grant.password);
         User.Model
             .findOne({
-                email: email.toLowerCase(),
+                email: grant.username.toLowerCase(),
                 hashedPassword: hashedPassword
             })
             .exec(function(err, user){
+                console.log("user ", user);
                 if(err || !user) return done(err, false);
 
-                var token = _generateToken(email + ":" + password);
+                var token = _generateToken(grant.username + ":" + grant.password);
 
                 _saveToken(token, user);
 
@@ -102,8 +106,13 @@ var AuthController = function(){
 
     };
 
-    var _authenticateToken = function(token, done) {
+    var _authenticateToken = function(token, req, done) {
         _getTokenData(token, function(err, data){
+            delete data.hashedPassword;
+            delete data.__v;
+
+            req.user = data;
+            console.log("setting user %j", data);
             return done(err, data);
         });
     };

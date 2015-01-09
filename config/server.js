@@ -1,7 +1,7 @@
 var ServerConfig = function(server) {
 
     var
-        Settings = require("./settings"),
+        conf = require("./settings"),
         restify = require("restify"),
         restifyOAuth2 = require("restify-oauth2"),
         auth = require("../controllers/auth"),
@@ -22,7 +22,7 @@ var ServerConfig = function(server) {
     restifyOAuth2.ropc(server, {
         tokenEndpoint: "/token",
         hooks: auth.oauthHooks,
-        tokenExpirationTime: Settings.auth.token.maxAge
+        tokenExpirationTime: conf.get('auth.token.maxAge')
     });
 
     /* Start CORS: All of this is required to get this working. */

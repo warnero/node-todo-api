@@ -1,7 +1,7 @@
 var cluster = require('cluster'),
     numCPUs = Math.min(2,require('os').cpus().length);
 
-if (cluster.isMaster && process.env.NODE_ENV != "testing") {
+if (cluster.isMaster && process.env.NODE_ENV != "test") {
     // Fork workers
     for (var i = 0; i < numCPUs; i++) {
         cluster.fork();
@@ -54,7 +54,9 @@ var
 var
     mongoose = require("mongoose");
 
+ServerConf = require("./config")(server);
 
+console.log("env port %s, conf port %s",process.env.PORT, conf.get('port'));
 server.listen(conf.get('port'), function(){
     console.log("Restify listening on port " + conf.get('port'));
 });
@@ -78,6 +80,6 @@ process.on('uncaughtException', function (err) {
     }, 30000);
 
     killtimer.unref();
-    if(process.env.NODE_ENV != "testing") cluster.worker.disconnect();
-    if(process.env.NODE_ENV == "testing") process.exit(1);
+    if(process.env.NODE_ENV != "test") cluster.worker.disconnect();
+    if(process.env.NODE_ENV == "test") process.exit(1);
 });

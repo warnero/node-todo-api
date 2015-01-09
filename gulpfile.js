@@ -3,30 +3,45 @@ var
     mocha = require('gulp-mocha'),
     jshint = require('gulp-jshint'),
     exit = require('gulp-exit'),
-    Q = require('q');
+    Q = require('q'),
+    TestData = require("./test/utils/data");
 
-process.env.PORT = 4000;
-process.env.MONGO_DEBUG = true;
-
-gulp.task('setup-e2e-data', function(callback){
-    var E2EData = require(__dirname + '/./e2e/data');
-    E2EData.createTestData(function(err) {
+gulp.task('setup-test-data',['clear-test-data'], function(callback){
+    TestData.createTestData(function(err){
         return callback(err);
     });
 });
 
-gulp.task('clear-e2e-data', function(callback){
-    var E2EData = require(__dirname + '/./e2e/data');
-    E2EData.clearDatabase(function(err){
-        return callback(err).pipe(exit());
+gulp.task('clear-test-data', function(callback){
+    TestData.clearDatabase(function(err){
+        return callback(err);
     });
 });
 
-gulp.task('start-server', function() {
+gulp.task('start-test-server', function() {
 
-  var
-      app = require(__dirname + '/./app');
+    var conf = require("./config/settings");
+    GLOBAL.server = "http://localhost:" + conf.get('port');
+    var
+        app = require(__dirname + '/./app');
 });
 
-gulp.task('clean-populate', ['clear-e2e-data','setup-e2e-data']);
-gulp.task('default', ['clear-e2e-data','setup-e2e-data', 'start-server']);
+gulp.task('run-tests',['start-test-server'], function() {
+    return gulp.src(['test/specs/*.test.js'], { read: false })
+        .pipe(mocha({
+            reporter: 'spec',
+            globals: {
+                should: require('should')
+            }
+        }))
+        .pipe(exit());
+});
+
+gulp.task('lint', function(done) {
+  return gulp.src(['./lib/*.js', 'test/*.test.js'])
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'));
+});
+
+gulp.task('clean-populate', ['clear-test-data','setup-test-data']);
+gulp.task('default', ['clean-populate', 'run-tests']);

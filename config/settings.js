@@ -34,7 +34,11 @@ var conf = convict({
     },
     redis: {
         url: "redis://localhost:6379",
-        options: {},
+        options: {
+            host: "",
+            port: "",
+            pass: ""
+        },
         debug: false,
         prefix: "todo:",
         env: "REDISTOGO_URL"
@@ -43,11 +47,13 @@ var conf = convict({
 
 
 var env = conf.get('env');
+console.log("port before loading env specifics %s, env port %s", conf.get('port'),process.env.PORT);
 conf.loadFile (__dirname + '/'+  env + '_config.json');
 
 conf.validate();
 
 var saveRedisDetails = function () {
+    console.log("calling redis details");
     var redis_url = require("url").parse(conf.get('redis.url'));
     conf.set('redis.options.host', redis_url.hostname);
     conf.set('redis.options.port', redis_url.port);

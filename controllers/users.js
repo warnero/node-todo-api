@@ -11,6 +11,7 @@ var UsersController = function(){
     var _current = function(req, res, next) {
         var
             user = req.user;
+        console.log("user %j", user);
         return res.send(user);
 
     };

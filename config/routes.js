@@ -1,7 +1,6 @@
 var Routes = function(server) {
 
     var
-        Settings = require("./settings"),
         auth = require("../controllers/auth"),
         users = require("../controllers/users");
 

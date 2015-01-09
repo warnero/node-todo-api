@@ -1,16 +1,16 @@
 var Redis = function(){
     var 
-        Settings = require("./settings"),
+        conf = require("./settings"),
         redis = require("redis"),
         rclient = redis.createClient(
-            Settings.redis.options.port, 
-            Settings.redis.options.host, 
-            Settings.redis.options
+            conf.get('redis.options.port'), 
+            conf.get('redis.options.host'), 
+            conf.get('redis.options')
         );
 
-    redis.debug_mode = Settings.redis.debug;
+    redis.debug_mode = conf.get('redis.debug');
 
-    if(Settings.redis.options.pass) rclient.auth(Settings.redis.options.pass);
+    if(conf.get('redis.options.pass')) rclient.auth(conf.get('redis.options.pass'));
 
     return rclient;
 }();
