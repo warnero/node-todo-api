@@ -6,7 +6,7 @@ var
     Q = require('q'),
     TestData = require("./test/utils/data");
 
-gulp.task('setup-test-data',['clear-test-data'], function(callback){
+gulp.task('setup-test-data', function(callback){
     TestData.createTestData(function(err){
         return callback(err);
     });

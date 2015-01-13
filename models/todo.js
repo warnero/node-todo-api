@@ -7,10 +7,12 @@ var TodoModel = function(){
     var _jsonSchema = {
         _id: {type:Schema.Types.ObjectId, "default":mongoose.Types.ObjectId},
         text: String,
+        notes: String,
         created: {type: Date, "default": Date.now},
         completed: {type:Boolean, "default": false},
         completedOn: Date,
-        position: {type:Number, "default":0}
+        position: {type:Number, "default":0},
+        user: {type: String, ref: "User"}
     };
 
     var _schema = mongoose.Schema(_jsonSchema);
